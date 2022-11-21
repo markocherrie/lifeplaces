@@ -4,7 +4,7 @@ library(leaflet)
 library(data.table)
 library(sf)
 
-
+# use haggis for historical?
 BING <- function(str){
   u <- URLencode(paste0("http://dev.virtualearth.net/REST/v1/Locations?q=", str, "&maxResults=1&key=Apo4HssxpmYvVbDEUA464pmX5Y30xsQNlJ4pES6Z6D056puS63D90MLZlQ1yVeTG"))
   d <- getURL(u)
@@ -43,13 +43,14 @@ ui <- fluidPage(
     dateInput("date3", "Date from:", value = Sys.Date(), format = "mm/dd/yy"),
     dateInput("date4", "Date to:", value = Sys.Date(), format = "mm/dd/yy"),
     textInput("comment", "Comment"),
+    # maybe occupation? have to change to bring in if work selected above
     div(style="display:inline-block", actionButton("goButton", "Enter")),
     downloadButton("downloadData", "Download data")
   ),
   mainPanel(
     tabsetPanel(type = "tabs",
-       tabPanel("Table", DTOutput("xy_Table")),
-       tabPanel("Map", leafletOutput("map"))
+       tabPanel("Map", leafletOutput("map")),
+       tabPanel("Table", DTOutput("xy_Table"))
     )
   )
 )
@@ -79,11 +80,15 @@ output$map <- renderLeaflet({
       setView(lng = -2, lat = 55, zoom = 6)
   })
   
+
 # This is what happens evertime a new address is added
 observeEvent(input$goButton, {
+  # create the reactive map
+  mapit<-leafletProxy("map")
+  
     #geocode the address
     data<-BING(input$str)
-    
+  
     # update the table fields
     xyTable$table1 <- xyTable$table1 %>% 
       add_row(Address = as.character(input$str),
@@ -93,28 +98,24 @@ observeEvent(input$goButton, {
               `Date from` = as.character(input$date3), 
               `Date to` = as.character(input$date4),
               Comment = as.character(input$comment))
-
+    # create the spatial points file
+    DT = data.frame(
+      lat=as.numeric(data[1]),
+      lng=as.numeric(data[2])
+    )
+    DT = st_as_sf(DT, coords = c("lng","lat"), remove = FALSE, crs = 4326)
+    # check we have a spatial point - delete
+    print(DT)
+    
 observe({
-  mapit <- leafletProxy("map")
-  
-  # create the spatial points file
-  lat<-c(data[1])
-  long<-c(data[2])
-  DT = data.frame(
-    lat=as.numeric(lat),
-    lng=as.numeric(long)
-  )
-  DT = st_as_sf(DT, coords = c("lng","lat"), remove = FALSE, crs = 4326)
-  # check we have aspatial point - delete
-  print(DT)
-  
-  if (nchar(input$str>0)) {
-  # update the map
-  mapit  %>%
-    addMarkers(data=DT) 
-  }
-}) 
-  }) 
+      # update the map
+      # create the reactive map
+      mapit %>%
+        addMarkers(data=DT) 
+    })
+  },  ignoreNULL=T) 
+
+
   
   output$comment <- renderText({ input$comment })
   
