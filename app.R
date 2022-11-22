@@ -33,7 +33,7 @@ ui <- fluidPage(
   # Header panel
   headerPanel(
     fluidRow(
-      column(11, h1("Lifeplaces",style = "font-family: 'Roboto Slab', cursive;font-weight: bold; font-size: 39px"))),
+      column(11, h1("LifeWorkPlaces",style = "font-family: 'Roboto Slab', cursive;font-weight: bold; font-size: 39px"))),
     windowTitle = "Lifeplaces"),
 
   
@@ -42,10 +42,14 @@ ui <- fluidPage(
     selectInput("type", "Type of Address:", choices = c("Home", "Work", "Other")),
     dateInput("date3", "Date from:", value = Sys.Date(), format = "mm/dd/yy"),
     dateInput("date4", "Date to:", value = Sys.Date(), format = "mm/dd/yy"),
-    textInput("comment", "Comment"),
+    textInput("comment", "Address Comment:"),
     # maybe occupation? have to change to bring in if work selected above
+    textInput("jobtitle:", "Job title"),
+    textInput("SIC", "SIC:"),
+    textInput("jobtask", "Job Task:"),
     div(style="display:inline-block", actionButton("goButton", "Enter")),
-    downloadButton("downloadData", "Download data")
+    downloadButton("downloadData", "Download data"),
+    actionButton("button", "Donate data")
   ),
   mainPanel(
     tabsetPanel(type = "tabs",
