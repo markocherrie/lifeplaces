@@ -3,10 +3,14 @@ library(tidyverse)
 library(leaflet)
 library(data.table)
 library(sf)
+library(shinyjs)
+library(DT)
+library(leaflet.extras)
+library(RCurl)
 
 # use haggis for historical?
 BING <- function(str){
-  u <- URLencode(paste0("http://dev.virtualearth.net/REST/v1/Locations?q=", str, "&maxResults=1&key=Apo4HssxpmYvVbDEUA464pmX5Y30xsQNlJ4pES6Z6D056puS63D90MLZlQ1yVeTG"))
+  u <- URLencode(paste0("http://dev.virtualearth.net/REST/v1/Locations?q=", str, "&maxResults=1&key=", Sys.getenv(c("BINGKEY"))))
   d <- getURL(u)
   j <- RJSONIO::fromJSON(d,simplify = FALSE) 
   if (j$resourceSets[[1]]$estimatedTotal > 0) {
@@ -38,15 +42,15 @@ ui <- fluidPage(
 
   
   sidebarPanel(
-    div(style="display:inline-block", textInput("str", label =("Enter a previous address"), value = "")),
+    div(style="display:inline-block", textInput("str", label =("Enter Address"), value = "")),
     selectInput("type", "Type of Address:", choices = c("Home", "Work", "Other")),
     dateInput("date3", "Date from:", value = Sys.Date(), format = "mm/dd/yy"),
     dateInput("date4", "Date to:", value = Sys.Date(), format = "mm/dd/yy"),
-    textInput("comment", "Address Comment:"),
+    textInput("comment", "Address Comments:"),
     # maybe occupation? have to change to bring in if work selected above
-    textInput("jobtitle:", "Job title"),
-    textInput("SIC", "SIC:"),
-    textInput("jobtask", "Job Task:"),
+    textInput("jobtitle:", "Job title:"),
+    #textInput("SIC", "SIC:"),
+    textInput("jobtask", "Job tasks:"),
     div(style="display:inline-block", actionButton("goButton", "Enter")),
     downloadButton("downloadData", "Download data"),
     actionButton("button", "Donate data")
