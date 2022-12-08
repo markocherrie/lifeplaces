@@ -10,7 +10,7 @@ library(RCurl)
 
 # use haggis for historical?
 BING <- function(str){
-  u <- URLencode(paste0("http://dev.virtualearth.net/REST/v1/Locations?q=", str, "&maxResults=1&key=", Sys.getenv(c("BINGKEY"))))
+  u <- URLencode(paste0("http://dev.virtualearth.net/REST/v1/Locations?q=", str, "&maxResults=1&key=Apo4HssxpmYvVbDEUA464pmX5Y30xsQNlJ4pES6Z6D056puS63D90MLZlQ1yVeTG"))
   d <- getURL(u)
   j <- RJSONIO::fromJSON(d,simplify = FALSE) 
   if (j$resourceSets[[1]]$estimatedTotal > 0) {
@@ -37,7 +37,7 @@ ui <- fluidPage(
   # Header panel
   headerPanel(
     fluidRow(
-      column(11, h1("LifeWorkPlaces",style = "font-family: 'Roboto Slab', cursive;font-weight: bold; font-size: 39px"))),
+      column(11, h1("LifePlaces",style = "font-family: 'Roboto Slab', cursive;font-weight: bold; font-size: 39px"))),
     windowTitle = "Lifeplaces"),
 
   
